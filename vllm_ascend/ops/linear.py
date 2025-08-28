@@ -37,7 +37,7 @@ from vllm_ascend.distributed.parallel_state import (
     get_mlp_tensor_model_parallel_rank,
     get_mlp_tensor_model_parallel_world_size, get_mlp_tp_group)
 
-
+# TODO 
 class AscendMlpColumnParallelLinear(ColumnParallelLinear):
     """Linear layer with column parallelism.
 
