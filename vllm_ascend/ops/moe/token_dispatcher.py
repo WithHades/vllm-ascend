@@ -271,6 +271,15 @@ class TokenDispatcherWithMC2(MoETokenDispatcher):
             **kwargs_mc2
         ) if self.enable_dispatch_v2 else torch_npu.npu_moe_distribute_combine(
             **kwargs_mc2)
+
+        self.output = None
+        self.assist_info_for_combine = None
+        self.ep_recv_counts = None
+        self.topk_ids = None
+        self.topk_weights = None
+        self.mc2_mask = None
+        self.expert_map = None
+
         if self.shared_experts is None:
             return hidden_states
         else:
@@ -280,6 +289,9 @@ class TokenDispatcherWithMC2(MoETokenDispatcher):
             else:
                 shared_hidden_states, _ = self.shared_experts.down_proj(
                     self.shared_act)
+            self.shared_act = None
+            self.shared_experts = None
+            self.swiglu_out_scale = None
             return hidden_states, shared_hidden_states
 
 
@@ -566,7 +578,10 @@ class TokenDispatcherWithAll2AllV(MoETokenDispatcher):
         self.input_splits = None
         self.output_splits = None
         self.num_global_tokens_per_local_expert = None
-
+        self.topk_weights = None
+        self.reversed_local_input_permutation_mapping = None
+        self.reversed_global_input_permutation_mapping = None
+        self.global_input_tokens_local_experts_indices = None
         return output
 
     def _dispatch_preprocess(self, hidden_states, topk_ids):
